@@ -42,6 +42,7 @@
   <ItemGroup>
     <None Include="vert.glsl" />
     <None Include="frag.glsl" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\Downloads\container.jpg">

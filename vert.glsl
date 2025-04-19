@@ -7,10 +7,14 @@ out vec3 fragColor;
 out vec3 test;
 out vec2 TextCoord;
 
+uniform mat4 model;
+uniform mat4 projection;
+uniform mat4 view;
+
 void main()
 {
-    gl_Position = vec4(aPos, 1.0);
-    fragColor = aColor;
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    fragColor = aPos;
     test = aPos;
     TextCoord = aCoord;
 }

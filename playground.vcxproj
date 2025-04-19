@@ -143,6 +143,7 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="frag.glsl" />
     <None Include="vert.glsl" />
   </ItemGroup>

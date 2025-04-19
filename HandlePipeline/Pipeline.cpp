@@ -5,6 +5,12 @@
 #include <fstream>
 #include <sstream>
 
+#include "../glm/glm.hpp"
+#include "../glm/gtc/matrix_transform.hpp"
+#include "../glm/gtc/type_ptr.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "../glm/gtx/string_cast.hpp"
+
 GLuint VBOs[3];
 
 void Pipeline::defineVertex(std::vector<float> vertex, std::vector<float> color, std::vector<float> coord)
@@ -27,23 +33,24 @@ void Pipeline::defineVertex(std::vector<float> vertex, std::vector<float> color,
 
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[2]);
     glBufferData(GL_ARRAY_BUFFER, coord.size() * sizeof(float), coord.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 }
 
-void Pipeline::handleShaders(const char* vertexPath, const char* fragmentPath)
+void Pipeline::handleShaders(const char* vertexPath, const char* fragmentPath, const glm::vec3 valueTrans, int angle)
 {
     // 1. Ler os arquivos
     std::ifstream vFile(vertexPath);
     std::ifstream fFile(fragmentPath);
 
+    std::cout << "valueTrans: " << glm::to_string(valueTrans) << "\n";
+
     if (!vFile.is_open() || !fFile.is_open()) {
         std::cerr << "Erro ao abrir os arquivos de shader.\n";
         return;
     }
-
     std::stringstream vBuffer, fBuffer;
     vBuffer << vFile.rdbuf();
     fBuffer << fFile.rdbuf();
@@ -69,7 +76,27 @@ void Pipeline::handleShaders(const char* vertexPath, const char* fragmentPath)
     glLinkProgram(shaderProgram);
 
     // 4. Usar o programa
+    
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = glm::translate(model, glm::vec3(valueTrans)); 
+    float test = 20.0f;
+    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(test * angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    GLuint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+    GLuint modelLoc = glGetUniformLocation(shaderProgram, "model");
+    GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
+
     glUseProgram(shaderProgram);
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glBindVertexArray(VAO);
 
     // 5. Apagar shaders (opcional)

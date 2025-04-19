@@ -6,11 +6,29 @@
 
 #include "../../playground/HandlePipeline/Pipeline.h"
 
+#include "../glm/glm.hpp"
+#include "../glm/gtc/matrix_transform.hpp"
+#include "../glm/gtc/type_ptr.hpp"
+#include "../glm/glm.hpp"
+
 // triangle
 std::vector<float> myTriangle{
      0.5f, -0.5f, 0.0f,
     -0.2f, -0.5f, 0.0f,
      0.0f, -0.3f, 0.0f
+};
+
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(0.8f, -1.0f, -0.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
 // second
@@ -28,21 +46,48 @@ std::vector<float> mySecondTriangle{
     0.0f, 0.0f, 1.0f
 };
 
-std::vector<float> coord{
-    // telhado
-    0.5f, 1.0f,  // topo
-    0.0f, 0.5f,  // canto esquerdo
-    1.0f, 0.5f,  // canto direito
-    
-    // base (retângulo) — 1º triângulo
-    0.0f, 0.5f,
+std::vector<float> textureCoords = {
     0.0f, 0.0f,
     1.0f, 0.0f,
-    
-    // base — 2º triângulo
-    0.0f, 0.5f,
+    1.0f, 1.0f,
+    1.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+
+    0.0f, 0.0f,
     1.0f, 0.0f,
-    1.0f, 0.5f
+    1.0f, 1.0f,
+    1.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+
+    0.0f, 1.0f,
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+
+    0.0f, 1.0f,
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f
 };
 
 // Color
@@ -60,23 +105,54 @@ std::vector<float> color{
     0.8f, 0.5f, 1.0f
 };
 
-std::vector<float> house1 {
-    // triangle             
-    0.1f, 0.6f, 0.0f,      
-    -0.3f, 0.4f, 0.0f, 
-    0.5f, 0.4f, 0.0f, 
+std::vector<float> cubeV = {
+    // Face de trás
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -0.3f, 0.4f, 0.0f,  
-    -0.3f, 0.0f, 0.0f,
-    0.5f, 0.0f, 0.0f, 
+    // Face da frente
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
 
-    -0.3f, 0.4f, 0.0f, 
-    0.5f, 0.0f, 0.0f,   
-    0.5f, 0.4f, 0.0f,
+    // Face esquerda
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
 
-    1.0f, 0.1f, 0.0f,
-    1.0f, 1.0f, 0.0f,
-    0.8f, 0.5f, 1.0f
+    // Face direita
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+
+     // Face inferior
+     -0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f,  0.5f,
+      0.5f, -0.5f,  0.5f,
+     -0.5f, -0.5f,  0.5f,
+     -0.5f, -0.5f, -0.5f,
+
+     // Face superior
+     -0.5f,  0.5f, -0.5f,
+      0.5f,  0.5f, -0.5f,
+      0.5f,  0.5f,  0.5f,
+      0.5f,  0.5f,  0.5f,
+     -0.5f,  0.5f,  0.5f,
+     -0.5f,  0.5f, -0.5f
 };
 
 HandleWindow::HandleWindow() {
@@ -89,24 +165,26 @@ void HandleWindow::MainLoop()
 
     // fisrt draw
     Pipeline pipeline;
-    pipeline.defineVertex(house1, color, coord);
-    pipeline.handleShaders("vert.glsl", "frag.glsl");
-    pipeline.handleTextures();
-    
-    //Pipeline pipeline2;
-    //pipeline2.defineVertex(mySecondTriangle, mySecondTriangle);
-    //pipeline.handleShaders("vert.glsl", "frag.glsl");
+    pipeline.defineVertex(cubeV, cubeV, textureCoords);
 
     while (!glfwWindowShouldClose(g_Window)) {
         glClearColor(1.0f, 1.0f, 0.5f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
         glBindVertexArray(pipeline.VAO);
-        //glPointSize(10.0f);
-        glDrawArrays(GL_TRIANGLES, 0, 9);
 
-        //glBindVertexArray(pipeline2.VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        pipeline.handleShaders("vert.glsl", "frag.glsl", cubePositions[0], 0);
+        pipeline.handleTextures();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        pipeline.handleShaders("vert.glsl", "frag.glsl", cubePositions[1], 1);
+        pipeline.handleTextures();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        pipeline.handleShaders("vert.glsl", "frag.glsl", cubePositions[2], 2);
+        pipeline.handleTextures();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        pipeline.handleShaders("vert.glsl", "frag.glsl", cubePositions[3], 3);
+        pipeline.handleTextures();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(g_Window);
         glfwPollEvents(); 
